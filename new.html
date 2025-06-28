@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌾 Farming News - Clean Style</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f9fa;
+      color: #2c3e50;
+    }
+
+    header {
+      background-color: #27ae60;
+      color: white;
+      padding: 18px 15px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    #search {
+      display: block;
+      margin: 20px auto;
+      padding: 14px 20px;
+      width: 90%;
+      max-width: 520px;
+      font-size: 16px;
+      border-radius: 25px;
+      border: 1.5px solid #27ae60;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+    #search:focus {
+      box-shadow: 0 0 8px #27ae60;
+      border-color: #1e8449;
+    }
+
+    #news-container {
+      max-width: 800px;
+      margin: 0 auto 40px;
+      padding: 0 10px;
+    }
+
+    .card {
+      background-color: white;
+      margin-bottom: 20px;
+      padding: 18px 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+      transition: box-shadow 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-weight: 700;
+      font-size: 22px;
+      color: #27ae60;
+      letter-spacing: 0.03em;
+    }
+
+    .card p {
+      margin-bottom: 0;
+      font-size: 16px;
+      line-height: 1.55;
+      color: #34495e;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        font-size: 22px;
+        padding: 14px 10px;
+      }
+      #search {
+        font-size: 14px;
+        padding: 12px 18px;
+      }
+      .card h3 {
+        font-size: 18px;
+      }
+      .card p {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>🌱 Farming News</header>
+
+  <input type="text" id="search" placeholder="Search farming news..." />
+
+  <div id="news-container">Loading news...</div>
+
+  <script>
+    const keywords = [
+      "farm", "farmer", "harvest", "agriculture", "irrigation", "crop", "soil",
+      "tractor", "organic", "greenhouse", "pesticide", "livestock", "drought","plow", "tractor", "barn", "pasture", "ranch",
+      "orchard", "vineyard", "aquaculture", "compost", "cover crop", "cattle", "feed", "grain", "hay", "landscape", "mulch",
+      "poultry", "silage", "tillage", "weed", "green manure", "biofuel", "canola", "cassava", "corn", "cotton", "durum",
+      "forage", "grazing", "hectare", "horticulture", "legume", "maize", "manure", "nitrate", "nutrient", "paddock",
+      "pastureland", "permaculture", "pest", "plantation", "plough", "precision agriculture", "reaping", "row crop",
+      "seedling", "silviculture", "sprout", "stubble", "subsistence farming", "sustainable agriculture", "tuber", "wheat",
+      "waterlogging", "windbreak", "winter wheat", "zinc", "animal husbandry", "beekeeping", "biodiversity", "crop rotation",
+      "cultivation", "drainage", "ecosystem", "fertilization", "fallow", "green revolution", "land reclamation", "monoculture",
+      "no-till", "organic matter", "pH level", "pollination", "soil erosion", "soil fertility", "soil moisture", "water table",
+      "weed control", "yield gap"
+    ];
+    
+
+    const newsContainer = document.getElementById("news-container");
+    const searchInput = document.getElementById("search");
+    let farmingNews = [];
+
+    function containsFarmingKeyword(text) {
+      return keywords.some(k => text.toLowerCase().includes(k));
+    }
+
+    function renderNews(newsList) {
+      newsContainer.innerHTML = "";
+      if (newsList.length === 0) {
+        newsContainer.innerHTML = "<p style='text-align:center; color: #999; font-size: 18px;'>No matching news found.</p>";
+        return;
+      }
+
+      newsList.forEach(article => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${article.title}</h3>
+          <p>${article.content}</p>
+        `;
+        newsContainer.appendChild(card);
+      });
+    }
+
+    fetch("http://localhost:3000/api/news")
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          farmingNews = data.data.filter(n =>
+            containsFarmingKeyword(n.title + " " + n.content)
+          );
+          renderNews(farmingNews);
+        } else {
+          newsContainer.innerHTML = "<p style='text-align:center; color: red;'>Failed to load news.</p>";
+        }
+      })
+      .catch(() => {
+        newsContainer.innerHTML = "<p style='text-align:center; color: red;'>Server error while loading news.</p>";
+      });
+
+    searchInput.addEventListener("input", () => {
+      const q = searchInput.value.toLowerCase().trim();
+      const filtered = farmingNews.filter(article =>
+        (article.title + " " + article.content).toLowerCase().includes(q)
+      );
+      renderNews(filtered);
+    });
+  </script>
+
+</body>
+</html>
