@@ -1,1 +1,1 @@
-# news-filtering-web-app-
+To develop a web application that intelligently filters and displays farming-related news from a mixed dataset of news articles, ensuring that users can quickly access agriculture-specific updates from a wide range of general news.
